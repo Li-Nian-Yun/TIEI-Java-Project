@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class test {
     public static void main(String[] args) {
-        File file = new File("C://Users//DELL//Desktop//java project//project//files//w.txt");
+        File file = new File("C://Users//DELL//Desktop//java project//project//files//word2.txt");
 
         try (FileInputStream fis = new FileInputStream(file)) {
             byte[] byteArray = new byte[(int) file.length()]; // 创建与文件大小相同的byte数组
