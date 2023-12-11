@@ -29,7 +29,7 @@ public class HuffmanModel {
 	public void compress(File inputFile) {
 		CompressFile cf = new CompressFile();
 		cf.compress();
-		support.firePropertyChange("msg",null , inputFile.getName() + "the file has been compressed");
+		support.firePropertyChange("msg",null , inputFile.getName() + " the file has been compressed");
 	}
 	
 	/**
