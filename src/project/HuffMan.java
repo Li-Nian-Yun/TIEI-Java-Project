@@ -7,10 +7,41 @@ import java.util.*;
 public class HuffMan {
     public static void main(String[] args) {
         //测试压缩文件
-        String srcFile = "C://Users//DELL//Desktop//java project//project//files//words.txt";
-        String dstFile = "C://Users//DELL//Desktop//java project//project//files//word2.txt";
-        zipFile(srcFile, dstFile);
-        System.out.println("压缩文件ok~~");
+//        String srcFile=args[0];
+//        String dstFile=args[1];
+////        String srcFile = "C://Users//DELL//Desktop//java project//project//files//words.txt";
+////        String dstFile = "C://Users//DELL//Desktop//java project//project//files//word2.txt";
+//        zipFile(srcFile, dstFile);
+//        System.out.println("压缩文件ok~~");
+        //用byte流读取文件./file/archive.tar
+        String filePath = "./files/doc.html.hu"; // 文件路径
+        try {
+            // 创建文件输入流
+            FileInputStream fileInputStream = new FileInputStream(filePath);
+
+            // 创建一个字节数组来存储读取的数据
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            byte[] bytes = new byte[4];
+            int number=123456789;
+            bytes[0] = (byte) (number >> 24); // 第一个字节
+            bytes[1] = (byte) (number >> 16); // 第二个字节
+            bytes[2] = (byte) (number >> 8);  // 第三个字节
+            bytes[3] = (byte) (number);       // 第四个字节
+            // 循环读取文件内容
+            while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                // 处理读取的数据，这里可以根据需求进行操作
+                // 例如，将字节数组转换为字符串并打印出来
+                String content = new String(buffer, 0, bytesRead);
+                System.out.print(content);
+            }
+
+            // 关闭文件输入流
+            fileInputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     static Map<Byte,String>huffmancodes=new HashMap<>();//如a->1001
