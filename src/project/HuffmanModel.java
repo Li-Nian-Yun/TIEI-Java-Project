@@ -11,10 +11,10 @@ import java.beans.*;
 public class HuffmanModel {
 	
 	private PropertyChangeSupport support;
-	
 	/**
 	 * Creates a HuffmanModel instance
 	 */
+	private final int MAGIC_NUMBER = 123456789;
 	public HuffmanModel() {
 		support = new PropertyChangeSupport(this);
 	}
@@ -27,17 +27,18 @@ public class HuffmanModel {
 	 * Compress the file 'inputFile'
 	 */
 	public void compress(File inputFile) {
-		CompressFile cf = new CompressFile();
+		CompressFile cf = new CompressFile(MAGIC_NUMBER);
 		cf.compress(inputFile);
 		support.firePropertyChange("msg",null , inputFile.getName() + " the file has been compressed");
+
 	}
 	
 	/**
 	 * Uncompress the file 'inputFile'
 	 */
 	public void uncompress(File inputFile) {
-		UncompressFile cf = new UncompressFile();
-		cf.uncompress();
+		UncompressFile cf = new UncompressFile(MAGIC_NUMBER);
+		cf.uncompress(inputFile);
 		support.firePropertyChange("msg",null , inputFile.getName() + " has been uncompressed");
 	}
 }

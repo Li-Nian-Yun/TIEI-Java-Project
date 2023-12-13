@@ -14,25 +14,27 @@ public class CompressFile {
     /**
      * Makes a file compressor
      */
-    public CompressFile() {
+    private static int MAGIC_NUMBER = 123456789;
 
+    public CompressFile(int magicNumber) {
+        MAGIC_NUMBER = magicNumber;
     }
 
     /**
      * Compress a file
      */
     public void compress(File inputFile) {
-        File outputFile =  new File(inputFile.toString()+".hu");
-        zipFile(inputFile,outputFile);
-    	System.out.println("file compression");
+        File outputFile = new File(inputFile.toString() + ".hu");
+        zipFile(inputFile, outputFile);
+        System.out.println("file compression");
     }
 
     public static void zipFile(File srcFile, File dstFile) {
         FileInputStream is = null;
         OutputStream os = null;
         try {
-            is=new FileInputStream(srcFile);
-            os=new FileOutputStream(dstFile);
+            is = new FileInputStream(srcFile);
+            os = new FileOutputStream(dstFile);
 
             byte[] compressedFile;//得到完整霍夫曼二进制长字符串转化为用于传输的byte形式
             compressedFile = HuffMan.huffmanZip(srcFile);
@@ -50,30 +52,30 @@ public class CompressFile {
             os.write(dataBits);
             //存放compressed file
             os.write(compressedFile);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
-        }finally {
+        } finally {
             try {
                 os.close();
                 is.close();
-            }catch (Exception e){
+            } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
         }
     }
 
     // 将霍夫曼编码过程封装起来，便于调用
-    public static byte[] huffmanZip(File FilePath){
+    public static byte[] huffmanZip(File FilePath) {
         List<TreeNode> contentList = HuffMan.getList(FilePath);//将字节数组转换为Node组成的List
         HuffMan.root = HuffMan.createHuffmanTree(contentList);
-        Map<Byte,String> huffmanCodes = HuffMan.getCodes(HuffMan.root);
-        byte[] zipCodes = HuffMan.zip(FilePath,huffmanCodes);
+        Map<Byte, String> huffmanCodes = HuffMan.getCodes(HuffMan.root);
+        byte[] zipCodes = HuffMan.zip(FilePath, huffmanCodes);
         return zipCodes;
     }
 
-    public static byte[] magicNumber(){
+    public static byte[] magicNumber() {
         byte[] magicNumber = new byte[5];
-        int number = 123456789;
+        int number = MAGIC_NUMBER;
         magicNumber[0] = 4;
         magicNumber[1] = (byte) (number >> 24); // 第一个字节
         magicNumber[2] = (byte) (number >> 16); // 第二个字节
@@ -82,7 +84,7 @@ public class CompressFile {
         return magicNumber;
     }
 
-    public static byte[] numberOfDataBits(){
+    public static byte[] numberOfDataBits() {
         int data = HuffMan.dataSize;
         int length = 1;
         while (data >= 128) {
@@ -91,7 +93,7 @@ public class CompressFile {
         }
         System.out.println(length);
         byte[] dataBits = new byte[length];
-        for(int i = 0; i < length; i++){
+        for (int i = 0; i < length; i++) {
             dataBits[i] = (byte) (HuffMan.dataSize >> (length - i - 1) * 8);
         }
         return dataBits;
