@@ -4,59 +4,15 @@ import java.io.*;
 import java.util.*;
 
 public class HuffMan {
-    public static void main(String[] args) {
-        //测试压缩文件
-        String srcFile = "./src/files/word.txt";
-        String dstFile = "./src/files/word.txt.hu";
-        zipFile(srcFile, dstFile);
-        System.out.println("压缩成功");
-
-    }
-
-    static Map<Byte,String> huffmanCodes=new HashMap<>();//如a->1001
+    static Map<Byte,String> huffmanCodes = new HashMap<>();//如a->1001
     static StringBuilder stringBuilder=new StringBuilder();//用来拼接字符串
     static TreeNode root;
     static int dataSize = 0;
     static int huffmanNodeSize = 0;
 
-    // 将一个文件进行压缩
-    public static void zipFile(String srcFile, String dstFile) {
-        FileInputStream is = null;
-        OutputStream os = null;
-        try {
-            is=new FileInputStream(srcFile);
-            os=new FileOutputStream(dstFile);
-
-            byte[] compressedFile;//得到完整霍夫曼二进制长字符串转化为用于传输的byte形式
-            compressedFile = huffmanZip(srcFile);
-
-            //存放magic number
-            os.write(magicNumber());
-
-            //存放huffman tree
-            byte[] huffmanTree = linearizationOfHummanTree(root);
-            os.write(huffmanTree);
-
-            //存放number of data bits
-            byte[] dataBits = numberOfDataBits();
-            os.write(dataBits.length);
-            os.write(dataBits);
-            //存放compressed file
-            os.write(compressedFile);
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }finally {
-            try {
-                os.close();
-                is.close();
-            }catch (Exception e){
-                System.out.println(e.getMessage());
-            }
-        }
-    }
 
     // 将霍夫曼编码过程封装起来，便于调用
-    public static byte[] huffmanZip(String FilePath){
+    public static byte[] huffmanZip(File FilePath){
         List<TreeNode> contentList = getList(FilePath);//将字节数组转换为Node组成的List
         root = createHuffmanTree(contentList);
         Map<Byte,String> huffmanCodes = getCodes(root);
@@ -65,35 +21,7 @@ public class HuffMan {
     }
 
 
-    public static byte[] magicNumber(){
-        byte[] magicNumber = new byte[5];
-        int number = 123456789;
-        magicNumber[0] = 4;
-        magicNumber[1] = (byte) (number >> 24); // 第一个字节
-        magicNumber[2] = (byte) (number >> 16); // 第二个字节
-        magicNumber[3] = (byte) (number >> 8);  // 第三个字节
-        magicNumber[4] = (byte) (number);       // 第四个字节
-        return magicNumber;
-    }
-
-    public static byte[] numberOfDataBits(){
-        int data = dataSize;
-
-        int length = 1;
-        while (data >= 128) {
-            data /= 128;
-            length++;
-        }
-        System.out.println(length);
-        byte[] dataBits = new byte[length];
-        for(int i = 0; i < length; i++){
-            dataBits[i] = (byte) (dataSize >> (length - i - 1)*8);
-            System.out.println(dataBits[i]);
-        }
-        return dataBits;
-    }
-
-    public static List<TreeNode> getList(String filePath){
+    public static List<TreeNode> getList(File filePath){
         ArrayList<TreeNode> nodes=new ArrayList<>();
         Map<Byte,Integer>counts=new HashMap<>();
         try {
@@ -104,6 +32,7 @@ public class HuffMan {
             int bytesRead;
             // 循环读取文件内容
             while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+
                 for(byte item:buffer){
                     if(item != 0){
                         Integer count=counts.get(item);
@@ -204,7 +133,7 @@ public class HuffMan {
     }
 
     // 将字符串对应的byte[]数组，根据霍夫曼编码Map,生成一长串二进制霍夫曼编码，并将其转换为byte[]
-    public static byte[] zip(String filePath,Map<Byte,String>huffmanCodes){
+    public static byte[] zip(File filePath,Map<Byte,String>huffmanCodes){
         StringBuilder stringBuilder=new StringBuilder();
         try {
             FileInputStream fileInputStream = new FileInputStream(filePath);
