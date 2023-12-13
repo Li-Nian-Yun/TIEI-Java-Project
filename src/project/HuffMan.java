@@ -6,10 +6,10 @@ import java.util.*;
 public class HuffMan {
     public static void main(String[] args) {
         //测试压缩文件
-        String srcFile = "C:\\Users\\DELL\\Desktop\\java\\TIEI-Java-Project\\src\\files\\word.txt";
-        String dstFile = "C:\\Users\\DELL\\Desktop\\java\\TIEI-Java-Project\\src\\files\\word.txt.hu";
+        String srcFile = "./src/files/word.txt";
+        String dstFile = "./src/files/word.txt.hu";
         zipFile(srcFile, dstFile);
-        System.out.println("压缩文件ok~~");
+        System.out.println("压缩成功");
 
     }
 
@@ -77,20 +77,20 @@ public class HuffMan {
     }
 
     public static byte[] numberOfDataBits(){
-        // 计算所需的字节数
-        ArrayList<Byte> byteList = new ArrayList<>();
         int data = dataSize;
+
+        int length = 1;
         while (data >= 128) {
-            byteList.add((byte) (data % 128));
             data /= 128;
+            length++;
         }
-        byteList.add((byte) data);
-        // 将List<Byte>转换为byte[]数组
-        byte[] byteArray = new byte[byteList.size()];
-        for (int i = 0; i < byteList.size(); i++) {
-            byteArray[i] = byteList.get(i);
+        System.out.println(length);
+        byte[] dataBits = new byte[length];
+        for(int i = 0; i < length; i++){
+            dataBits[i] = (byte) (dataSize >> (length - i - 1)*8);
+            System.out.println(dataBits[i]);
         }
-        return byteArray;
+        return dataBits;
     }
 
     public static List<TreeNode> getList(String filePath){
