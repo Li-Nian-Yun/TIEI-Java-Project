@@ -1,24 +1,21 @@
 package project;
-
 import java.io.*;
 import java.util.*;
 
 public class HuffMan {
-    static Map<Byte,String> huffmanCodes = new HashMap<>();//如a->1001
-    static StringBuilder stringBuilder=new StringBuilder();//用来拼接字符串
-    static TreeNode root;
-    static int dataSize = 0;
-    static int huffmanNodeSize = 0;
+    private static int READ_BUFFER_SIZE = 1024;
+    private static Map<Byte,String> huffmanCodes = new HashMap<>();
+    private static StringBuilder stringBuilder=new StringBuilder();//used to concatenate strings
+    public static TreeNode root;
+    public static int dataSize = 0;
+    public static int huffmanNodeSize = 0;
 
     public static List<TreeNode> getCounts(File filePath){
         ArrayList<TreeNode> nodes=new ArrayList<>();
         Map<Byte,Integer> counts=new HashMap<>();
         try {
-            // 创建文件输入流
             FileInputStream fileInputStream = new FileInputStream(filePath);
-            // 创建一个字节数组来存储读取的数据
-            byte[] buffer = new byte[1024];
-            // 循环读取文件内容
+            byte[] buffer = new byte[READ_BUFFER_SIZE];
             while ( fileInputStream.read(buffer) != -1) {
                 for(byte item:buffer){
                     if(item != 0){
@@ -30,7 +27,6 @@ public class HuffMan {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //遍历Map
         for(Map.Entry<Byte,Integer>entry:counts.entrySet()){
             nodes.add(new TreeNode(entry.getKey(),entry.getValue()));
         }
@@ -38,13 +34,12 @@ public class HuffMan {
         return nodes;
     }
 
-    //构建霍夫曼树
     public static TreeNode createHuffmanTree(List<TreeNode> nodes){
         while(nodes.size() >  1){
             Collections.sort(nodes);
             TreeNode leftNode=nodes.get(0);
             TreeNode rightNode=nodes.get(1);
-            TreeNode parentNode=new TreeNode(null,leftNode.value+rightNode.value);//非叶子节点只有权重，没有data
+            TreeNode parentNode=new TreeNode(null,leftNode.weight+rightNode.weight);//非叶子节点只有权重，没有data
             parentNode.left=leftNode;
             parentNode.right=rightNode;
             nodes.remove(0);
@@ -54,41 +49,41 @@ public class HuffMan {
         return nodes.get(0);
     }
 
-    public static void linearization(TreeNode node, ArrayList<Byte> linearization){
+    public static void linearization(TreeNode node, ArrayList<Byte> linearArray){
         if(node!=null){
             if(node.data==null){
-                linearization.add((byte) 0);
-                linearization(node.left,linearization);
-                linearization(node.right,linearization);
+                linearArray.add((byte) 0);
+                linearization(node.left,linearArray);
+                linearization(node.right,linearArray);
             }else{
-                linearization.add((byte) 1);
-                linearization.add(node.data);
+                linearArray.add((byte) 1);
+                linearArray.add(node.data);
             }
         }
     }
 
 
     public static byte[] linearization(TreeNode node){
-        ArrayList<Byte> linearization = new ArrayList<>();
+        ArrayList<Byte> linearArray = new ArrayList<>();
         if(node!=null){
             if(node.data==null){
-                linearization.add((byte) 0);
-                linearization(node.left,linearization);
-                linearization(node.right,linearization);
+                linearArray.add((byte) 0);
+                linearization(node.left,linearArray);
+                linearization(node.right,linearArray);
             }else{
-                linearization.add((byte) 1);
-                linearization.add(node.data);
+                linearArray.add((byte) 1);
+                linearArray.add(node.data);
             }
         }
-        byte[] c = new byte[linearization.size()];
+        byte[] linearizationHuffmanTree= new byte[linearArray.size()];
         int index = 0;
-        for (byte item:linearization) {
-            c[index++] = item;
+        for (byte item:linearArray) {
+            linearizationHuffmanTree[index++] = item;
         }
-        return  c;
+        return  linearizationHuffmanTree;
     }
 
-    // 将霍夫曼树转为霍夫曼编码并存入Map中
+    // Convert the Huffman tree to Huffman encoding
     public static void getCodes(TreeNode node,String currentCode,StringBuilder stringBuilder){
         StringBuilder stringBuilder2=new StringBuilder(stringBuilder);
         stringBuilder2.append(currentCode);
@@ -99,11 +94,10 @@ public class HuffMan {
             }else{
                 huffmanCodes.put(node.data,stringBuilder2.toString());
             }
-
         }
     }
 
-    // 将getCodes函数重载(使得引用形式更为简洁)
+    // Override the getCodes function (making the reference form more concise)
     public static Map<Byte,String> getCodes(TreeNode node){
         if(node==null){
             return null;
@@ -114,11 +108,11 @@ public class HuffMan {
     }
 
     // 将字符串对应的byte[]数组，根据霍夫曼编码Map,生成一长串二进制霍夫曼编码，并将其转换为byte[]
-    public static byte[] zip(File filePath,Map<Byte,String>huffmanCodes){
+    public static byte[] compress(File filePath,Map<Byte,String>huffmanCodes){
         StringBuilder stringBuilder=new StringBuilder();
         try {
             FileInputStream fileInputStream = new FileInputStream(filePath);
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[READ_BUFFER_SIZE];
             while (fileInputStream.read(buffer)!= -1) {
                 for(byte b:buffer){
                     //获得完整的二进制霍夫曼编码
@@ -154,5 +148,6 @@ public class HuffMan {
         }
         return huffmanCodesByte;
     }
+
 }
 

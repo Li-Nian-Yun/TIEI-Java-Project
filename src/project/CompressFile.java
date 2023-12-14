@@ -1,5 +1,4 @@
 package project;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,11 +10,13 @@ import java.util.Map;
  * A class for file compression
  */
 public class CompressFile {
+    private final int BYTE_MAX = 128;
+    private static int MAGIC_NUMBER;
     /**
      * Makes a file compressor
      */
-    public CompressFile() {
-
+    public CompressFile(int magicNumber) {
+        MAGIC_NUMBER = magicNumber;
     }
 
     /**
@@ -27,28 +28,23 @@ public class CompressFile {
         System.out.println("file compression");
     }
 
-    public  void zipFile(File srcFile, File dstFile) {
+    public void zipFile(File inputFile, File outputFile) {
         FileInputStream is = null;
         OutputStream os = null;
         try {
-            is=new FileInputStream(srcFile);
-            os=new FileOutputStream(dstFile);
-
-            byte[] compressedFile;//得到完整霍夫曼二进制长字符串转化为用于传输的byte形式
-            compressedFile = huffmanZip(srcFile);
-
+            is=new FileInputStream(inputFile);
+            os=new FileOutputStream(outputFile);
+            byte[] compressedFile;
+            compressedFile = huffmanCompress(inputFile);
             //存放magic number
             os.write(magicNumber());
-
             //存放huffman tree
             byte[] huffmanTree = HuffMan.linearization(HuffMan.root);
             os.write(huffmanTree);
-
             //存放number of data bits
             byte[] dataBits = numberOfDataBits();
             os.write(dataBits.length);
             os.write(dataBits);
-
             //存放compressed file
             os.write(compressedFile);
         }catch (Exception e){
@@ -63,39 +59,39 @@ public class CompressFile {
         }
     }
 
-    // 将霍夫曼编码过程封装起来，便于调用
-    public byte[] huffmanZip(File FilePath){
-        List<TreeNode> contentList = HuffMan.getCounts(FilePath);//将字节数组转换为Node组成的List
+    // package the Huffman encoding process for easy calling
+    public byte[] huffmanCompress(File FilePath){
+        List<TreeNode> contentList = HuffMan.getCounts(FilePath);//Convert byte arrays into a List composed of Nodes
         HuffMan.root = HuffMan.createHuffmanTree(contentList);
         Map<Byte,String> huffmanCodes = HuffMan.getCodes(HuffMan.root);
-        byte[] zipCodes = HuffMan.zip(FilePath,huffmanCodes);
-        return zipCodes;
+        return HuffMan.compress(FilePath,huffmanCodes);
     }
 
     public byte[] magicNumber(){
-        byte[] magicNumber = new byte[5];
-        int number = 123456789;
-        magicNumber[0] = 4;
-        magicNumber[1] = (byte) (number >> 24); // 第一个字节
-        magicNumber[2] = (byte) (number >> 16); // 第二个字节
-        magicNumber[3] = (byte) (number >> 8);  // 第三个字节
-        magicNumber[4] = (byte) (number);       // 第四个字节
+        int data = MAGIC_NUMBER;
+        int length = 1;
+        while (data >= BYTE_MAX) {
+            data /= BYTE_MAX;
+            length++;
+        }
+        byte[] magicNumber = new byte[length];
+        for(int i = 0; i < length; i++){
+            magicNumber[i] = (byte) (MAGIC_NUMBER >> (length - i - 1) * 8);
+        }
         return magicNumber;
     }
 
     public byte[] numberOfDataBits(){
         int data = HuffMan.dataSize;
         int length = 1;
-        while (data >= 128) {
-            data /= 128;
+        while (data >= BYTE_MAX) {
+            data /= BYTE_MAX;
             length++;
         }
-        System.out.println(length);
         byte[] dataBits = new byte[length];
         for(int i = 0; i < length; i++){
             dataBits[i] = (byte) (HuffMan.dataSize >> (length - i - 1) * 8);
         }
         return dataBits;
     }
-
 }
