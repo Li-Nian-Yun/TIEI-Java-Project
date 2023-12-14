@@ -24,7 +24,7 @@ public class CompressFile {
     public void compress(File inputFile) {
         File outputFile =  new File(inputFile.toString()+".hu");
         zipFile(inputFile,outputFile);
-    	System.out.println("file compression");
+        System.out.println("file compression");
     }
 
     public  void zipFile(File srcFile, File dstFile) {

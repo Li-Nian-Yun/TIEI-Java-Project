@@ -8,6 +8,7 @@ import java.util.Arrays;
 
 public class test {
     public static void main(String[] args) throws FileNotFoundException {
+<<<<<<< HEAD
         String filePath = "./files/image.png.hu";
 
         try {
@@ -30,5 +31,11 @@ public class test {
         } catch (IOException e) {
             e.printStackTrace();
         }
+=======
+        String filePath = "./src/files/archive.tar.hu";
+        File inputFile = new File(filePath);
+        UncompressFile cf = new UncompressFile(123456789);
+        cf.uncompress(inputFile);
+>>>>>>> 3a85ffbd86350db75e2ee9bda8838caa61550a86
     }
 }
