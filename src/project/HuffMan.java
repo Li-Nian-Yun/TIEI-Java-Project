@@ -3,9 +3,9 @@ import java.io.*;
 import java.util.*;
 
 public class HuffMan {
-    private static int READ_BUFFER_SIZE = 1024;
-    private static Map<Byte,String> huffmanCodes = new HashMap<>();
-    private static StringBuilder stringBuilder=new StringBuilder();//used to concatenate strings
+    private static final int READ_BUFFER_SIZE = 1024;
+    private static final Map<Byte,String> huffmanCodes = new HashMap<>();
+    private static final StringBuilder stringBuilder=new StringBuilder();//used to concatenate strings
     public static TreeNode root;
     public static int dataSize = 0;
     public static int huffmanNodeSize = 0;
@@ -109,10 +109,10 @@ public class HuffMan {
 
     /*
         generate a long string of binary Huffman codes based on the Huffman encoding map
-    using the byte [] array corresponding to the string, and convert it to byte[]
+        using the byte [] array corresponding to the string, and convert it to byte[]
     */
     public static byte[] compress(File filePath,Map<Byte,String>huffmanCodes){
-        StringBuilder stringBuilder=new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         try {
             FileInputStream fileInputStream = new FileInputStream(filePath);
             byte[] buffer = new byte[READ_BUFFER_SIZE];
@@ -146,7 +146,7 @@ public class HuffMan {
             }else{
                 curString = stringBuilder.substring(i,i + 8);
             }
-            huffmanCodesByte[index] = (byte)Integer.parseInt(curString,2);//默认curString为二进制的格式，将其转化为十进制的Int,再类型转换为byte
+            huffmanCodesByte[index] = (byte)Integer.parseInt(curString,2);
             index++;
         }
         return huffmanCodesByte;
