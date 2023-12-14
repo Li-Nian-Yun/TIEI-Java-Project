@@ -83,6 +83,5 @@ public class UncompressFile {
         return readMagicNumber == MAGIC_NUMBER;
     }
 
-    private
 
 }

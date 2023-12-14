@@ -1,6 +1,8 @@
 package project;
 
 
+import com.sun.source.tree.Tree;
+
 //构建节点类
 class TreeNode implements Comparable<TreeNode>{
     Byte data;//存放的数据
@@ -11,6 +13,13 @@ class TreeNode implements Comparable<TreeNode>{
     public TreeNode(Byte data, int value) {
         this.data = data;
         this.value = value;
+    }
+
+    public TreeNode(Byte data, int value, TreeNode left, TreeNode right) {
+        this.data = data;
+        this.value = value;
+        this.left = left;
+        this.right = right;
     }
 
     @Override
