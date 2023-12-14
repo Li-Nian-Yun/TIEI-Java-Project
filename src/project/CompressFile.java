@@ -27,7 +27,7 @@ public class CompressFile {
     	System.out.println("file compression");
     }
 
-    public static void zipFile(File srcFile, File dstFile) {
+    public  void zipFile(File srcFile, File dstFile) {
         FileInputStream is = null;
         OutputStream os = null;
         try {
@@ -35,19 +35,20 @@ public class CompressFile {
             os=new FileOutputStream(dstFile);
 
             byte[] compressedFile;//得到完整霍夫曼二进制长字符串转化为用于传输的byte形式
-            compressedFile = HuffMan.huffmanZip(srcFile);
+            compressedFile = huffmanZip(srcFile);
 
             //存放magic number
             os.write(magicNumber());
 
             //存放huffman tree
-            byte[] huffmanTree = HuffMan.linearizationOfHummanTree(HuffMan.root);
+            byte[] huffmanTree = HuffMan.linearization(HuffMan.root);
             os.write(huffmanTree);
 
             //存放number of data bits
             byte[] dataBits = numberOfDataBits();
             os.write(dataBits.length);
             os.write(dataBits);
+
             //存放compressed file
             os.write(compressedFile);
         }catch (Exception e){
@@ -63,15 +64,15 @@ public class CompressFile {
     }
 
     // 将霍夫曼编码过程封装起来，便于调用
-    public static byte[] huffmanZip(File FilePath){
-        List<TreeNode> contentList = HuffMan.getList(FilePath);//将字节数组转换为Node组成的List
+    public byte[] huffmanZip(File FilePath){
+        List<TreeNode> contentList = HuffMan.getCounts(FilePath);//将字节数组转换为Node组成的List
         HuffMan.root = HuffMan.createHuffmanTree(contentList);
         Map<Byte,String> huffmanCodes = HuffMan.getCodes(HuffMan.root);
         byte[] zipCodes = HuffMan.zip(FilePath,huffmanCodes);
         return zipCodes;
     }
 
-    public static byte[] magicNumber(){
+    public byte[] magicNumber(){
         byte[] magicNumber = new byte[5];
         int number = 123456789;
         magicNumber[0] = 4;
@@ -82,7 +83,7 @@ public class CompressFile {
         return magicNumber;
     }
 
-    public static byte[] numberOfDataBits(){
+    public byte[] numberOfDataBits(){
         int data = HuffMan.dataSize;
         int length = 1;
         while (data >= 128) {
