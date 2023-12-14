@@ -75,7 +75,7 @@ public class HuffMan {
                 linearArray.add(node.data);
             }
         }
-        byte[] linearizationHuffmanTree= new byte[linearArray.size()];
+        byte[] linearizationHuffmanTree = new byte[linearArray.size()];
         int index = 0;
         for (byte item:linearArray) {
             linearizationHuffmanTree[index++] = item;
@@ -107,7 +107,10 @@ public class HuffMan {
         return huffmanCodes;
     }
 
-    // 将字符串对应的byte[]数组，根据霍夫曼编码Map,生成一长串二进制霍夫曼编码，并将其转换为byte[]
+    /*
+        generate a long string of binary Huffman codes based on the Huffman encoding map
+    using the byte [] array corresponding to the string, and convert it to byte[]
+    */
     public static byte[] compress(File filePath,Map<Byte,String>huffmanCodes){
         StringBuilder stringBuilder=new StringBuilder();
         try {
@@ -115,7 +118,7 @@ public class HuffMan {
             byte[] buffer = new byte[READ_BUFFER_SIZE];
             while (fileInputStream.read(buffer)!= -1) {
                 for(byte b:buffer){
-                    //获得完整的二进制霍夫曼编码
+                    //obtain complete binary Huffman encoding
                     if(b != 0){
                         stringBuilder.append(huffmanCodes.get(b));
                     }
@@ -125,25 +128,25 @@ public class HuffMan {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //计算将二进制霍夫曼编码转为byte[]的位数
+        //calculate the number of bits to convert binary Huffman encoding to byte []
         int len;
         if(stringBuilder.length() % 8 == 0){
             len = stringBuilder.length() / 8;
         }else{
-            len = stringBuilder.length() / 8 + 1;//可能不能被整除
+            len = stringBuilder.length() / 8 + 1;
         }
         dataSize = stringBuilder.length();
-        //创建压缩好的byte[]数组
-        int index=0;
-        byte[] huffmanCodesByte=new byte[len];
-        for (int i = 0; i <stringBuilder.length(); i=i+8) {
+        //create a compressed byte [] array
+        int index = 0;
+        byte[] huffmanCodesByte = new byte[len];
+        for (int i = 0; i < stringBuilder.length(); i=i+8) {
             String curString;
-            if(stringBuilder.length()<i+8){
+            if(stringBuilder.length() < i + 8){
                 curString = stringBuilder.substring(i);
             }else{
-                curString = stringBuilder.substring(i,i+8);//substring坐标索引前包后不包
+                curString = stringBuilder.substring(i,i + 8);
             }
-            huffmanCodesByte[index]=(byte)Integer.parseInt(curString,2);//默认curString为二进制的格式，将其转化为十进制的Int,再类型转换为byte
+            huffmanCodesByte[index] = (byte)Integer.parseInt(curString,2);//默认curString为二进制的格式，将其转化为十进制的Int,再类型转换为byte
             index++;
         }
         return huffmanCodesByte;
