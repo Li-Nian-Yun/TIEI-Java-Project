@@ -8,9 +8,7 @@ import java.util.Arrays;
 
 public class test {
     public static void main(String[] args) throws FileNotFoundException {
-        String filePath = "./src/files/archive.tar.hu";
-        File inputFile = new File(filePath);
-        UncompressFile cf = new UncompressFile(123456789);
-        cf.uncompress(inputFile);
+
+
     }
 }
