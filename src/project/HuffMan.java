@@ -11,14 +11,6 @@ public class HuffMan {
     static int huffmanNodeSize = 0;
 
 
-    // 将霍夫曼编码过程封装起来，便于调用
-    public static byte[] huffmanZip(File FilePath){
-        List<TreeNode> contentList = getList(FilePath);//将字节数组转换为Node组成的List
-        root = createHuffmanTree(contentList);
-        Map<Byte,String> huffmanCodes = getCodes(root);
-        byte[] zipCodes = zip(FilePath,huffmanCodes);
-        return zipCodes;
-    }
 
 
     public static List<TreeNode> getList(File filePath){

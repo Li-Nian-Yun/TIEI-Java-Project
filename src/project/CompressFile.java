@@ -37,7 +37,7 @@ public class CompressFile {
             os = new FileOutputStream(dstFile);
 
             byte[] compressedFile;//得到完整霍夫曼二进制长字符串转化为用于传输的byte形式
-            compressedFile = HuffMan.huffmanZip(srcFile);
+            compressedFile = huffmanZip(srcFile);
 
             //存放magic number
             os.write(magicNumber());
