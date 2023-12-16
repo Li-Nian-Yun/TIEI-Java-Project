@@ -161,8 +161,28 @@ public class HuffMan {
         return huffmanCodesByte;
     }
 
-    public TreeNode delinearization(FileInputStream fileInputStream){
-        return null;
+    public static TreeNode delinearization(FileInputStream fileInputStream) throws IOException {
+        TreeNode root = new TreeNode(null, 0);
+        byte[] buffer = new byte[READ_BUFFER_SIZE];
+        int bytesRead = fileInputStream.read(buffer);
+        delinearizationHelper(fileInputStream, root);
+        return root;
+    }
+
+    private static void delinearizationHelper(FileInputStream fileInputStream, TreeNode node) throws IOException {
+        int readByte = fileInputStream.read();
+        if (readByte == -1) return;
+
+        if (readByte == 0) {
+            // Internal node
+            node.left = new TreeNode(null, 0);
+            delinearizationHelper(fileInputStream, node.left);
+            node.right = new TreeNode(null, 0);
+            delinearizationHelper(fileInputStream, node.right);
+        } else if (readByte == 1) {
+            // Leaf node
+            node.data = (byte) fileInputStream.read();
+        }
     }
 
 }

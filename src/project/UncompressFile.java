@@ -3,6 +3,8 @@ package project;
 import java.io.*;
 import java.nio.Buffer;
 
+import static project.HuffMan.delinearization;
+
 /**
  * A class for file uncompression
  */
@@ -47,6 +49,8 @@ public class UncompressFile {
                 System.out.println("Magic number is not correct.");
                 return;
             }
+            // 读取huffman树
+            TreeNode root = delinearization(fileInputStream);
 
             fileInputStream.close();
         } catch (IOException e) {
