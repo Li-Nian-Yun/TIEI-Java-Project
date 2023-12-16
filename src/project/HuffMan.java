@@ -111,16 +111,33 @@ public class HuffMan {
         generate a long string of binary Huffman codes based on the Huffman encoding map
         using the byte [] array corresponding to the string, and convert it to byte[]
     */
-    public static byte[] compress(File filePath,Map<Byte,String>huffmanCodes){
-        StringBuilder stringBuilder = new StringBuilder();
+    public static byte[] compress(File filePath,Map<Byte,String> huffmanCodes){
+        ArrayList<Byte> compressArray = new ArrayList<>();
+        int a_byte = 0;
+        int index = 0;
         try {
             FileInputStream fileInputStream = new FileInputStream(filePath);
             byte[] buffer = new byte[READ_BUFFER_SIZE];
             while (fileInputStream.read(buffer)!= -1) {
-                for(byte b:buffer){
+                for(byte item:buffer){
                     //obtain complete binary Huffman encoding
-                    if(b != 0){
-                        stringBuilder.append(huffmanCodes.get(b));
+                    if(item != 0){
+                        String s = huffmanCodes.get(item);
+                        for(int i = 0; i < s.length(); i++){
+                            if(s.charAt(i) == '0'){
+                                a_byte = a_byte << 1;
+                                index++;
+                            }else{
+                                a_byte = a_byte << 1;
+                                a_byte++;
+                                index++;
+                            }
+                            if(index == 8){
+                                index = 0;
+                                compressArray.add((byte) a_byte);
+                                a_byte = 0;
+                            }
+                        }
                     }
                 }
             }
@@ -128,26 +145,18 @@ public class HuffMan {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //calculate the number of bits to convert binary Huffman encoding to byte []
-        int len;
-        if(stringBuilder.length() % 8 == 0){
-            len = stringBuilder.length() / 8;
-        }else{
-            len = stringBuilder.length() / 8 + 1;
-        }
-        dataSize = stringBuilder.length();
-        //create a compressed byte [] array
-        int index = 0;
-        byte[] huffmanCodesByte = new byte[len];
-        for (int i = 0; i < stringBuilder.length(); i=i+8) {
-            String curString;
-            if(stringBuilder.length() < i + 8){
-                curString = stringBuilder.substring(i);
-            }else{
-                curString = stringBuilder.substring(i,i + 8);
+        if(index > 0){
+            while(index < 8){
+                a_byte = a_byte << 1;
+                index++;
             }
-            huffmanCodesByte[index] = (byte)Integer.parseInt(curString,2);
-            index++;
+            compressArray.add((byte)a_byte);
+        }
+        int len = compressArray.size();
+        byte[] huffmanCodesByte = new byte[len];
+        int i = 0;
+        for (byte item:compressArray) {
+            huffmanCodesByte[i++] = item;
         }
         return huffmanCodesByte;
     }

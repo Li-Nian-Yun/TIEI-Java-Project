@@ -23,7 +23,7 @@ public class CompressFile {
      * Compress a file
      */
     public void compress(File inputFile) {
-        File outputFile =  new File(inputFile.toString()+".hua");
+        File outputFile =  new File(inputFile.toString()+".hu");
         zipFile(inputFile,outputFile);
         System.out.println("file compression");
     }
