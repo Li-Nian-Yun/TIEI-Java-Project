@@ -74,9 +74,10 @@ public class CompressFile {
             data /= BYTE_MAX;
             length++;
         }
-        byte[] magicNumber = new byte[length];
-        for(int i = 0; i < length; i++){
-            magicNumber[i] = (byte) (MAGIC_NUMBER >> (length - i - 1) * 8);
+        byte[] magicNumber = new byte[length+1];
+        magicNumber[0] = (byte) length;
+        for(int i = 1; i < length+1; i++){
+            magicNumber[i] = (byte) (MAGIC_NUMBER >> (length - i) * 8);
         }
         return magicNumber;
     }
