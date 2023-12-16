@@ -161,5 +161,9 @@ public class HuffMan {
         return huffmanCodesByte;
     }
 
+    public TreeNode delinearization(FileInputStream fileInputStream){
+        return null;
+    }
+
 }
 
