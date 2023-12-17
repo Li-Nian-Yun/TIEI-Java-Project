@@ -15,7 +15,7 @@ public class UncompressFile {
 
     private int currentByte;
     private int bitsRemaining;
-    private Long fileSize;
+    private Long fileBitSize;
 
     public UncompressFile(int magicNumber) {
         MAGIC_NUMBER = magicNumber;
@@ -48,7 +48,7 @@ public class UncompressFile {
             TreeNode root = delinearization(fileInputStream);
 
             // 读取文件大小
-            this.fileSize = getCompressedFileSize(fileInputStream);
+            this.fileBitSize = getCompressedFileSize(fileInputStream);
 
             // 创建文件输出流,在原始目录下创建一个新的文件
             String outputFileName = input.getName().substring(0, input.getName().length() - 3);
@@ -77,6 +77,10 @@ public class UncompressFile {
                     outputStream.write(current.data);
                     current = root;
                 }
+                this.fileBitSize--;
+                if (this.fileBitSize == 0) {
+                    break;
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -87,9 +91,8 @@ public class UncompressFile {
     public int readNextBit(FileInputStream inputStream) throws IOException {
         if (bitsRemaining == 0) {
             currentByte = inputStream.read();
-            this.fileSize--;
             if (currentByte == -1) {
-                return -1; // 文件结束
+                return -1;
             }
             bitsRemaining = 8;
         }
@@ -130,5 +133,21 @@ public class UncompressFile {
             readNumber = (readNumber << 8) | (buffer[i] & 0xFF);
         }
         return readNumber;
+    }
+
+    public static String bytesToHex(byte[] bytes) {
+        StringBuilder hexString = new StringBuilder();
+
+        for (byte b : bytes) {
+            // 将byte转换为无符号并转换为十六进制字符串
+            String hex = Integer.toHexString(b & 0xFF);
+            if (hex.length() == 1) {
+                // 保证每个字节转换后都是两位数
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+
+        return hexString.toString();
     }
 }
