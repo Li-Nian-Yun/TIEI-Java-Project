@@ -24,43 +24,37 @@ public class UncompressFile {
     /**
      * Uncompress a file
      */
-    public void uncompress(File input) {
+    public void uncompress(File input) throws IOException, MyException {
         //判断文件是否存在
         if (!input.exists()) {
-            System.out.println("file does not exist");
-            return;
+            throw new FileNotFoundException("file not found");
         }
         //判断文件是否为.hu文件
         if (!input.getName().endsWith(".hu")) {
-            System.out.println("file is not a .hu file");
-            return;
+            throw new MyException("file is not a .hu file");
         }
 
-        try {
-            // 创建文件输入流
-            FileInputStream fileInputStream = new FileInputStream(input);
-            // 创建一个字节数组来存储读取的数据
-            if (!verifyMagicNumber(fileInputStream)) {
-                System.out.println("Magic number is not correct.");
-                return;
-            }
-            // 读取huffman树
-            TreeNode root = delinearization(fileInputStream);
-
-            // 读取文件大小
-            this.fileBitSize = getCompressedFileSize(fileInputStream);
-
-            // 创建文件输出流,在原始目录下创建一个新的文件
-            String outputFileName = input.getName().substring(0, input.getName().length() - 3);
-            FileOutputStream fileOutputStream = new FileOutputStream(input.getParent() + "/" + outputFileName);
-
-            // 读取文件内容并且做映射写入
-            unCompressedFile(fileInputStream, fileOutputStream, root);
-
-            fileInputStream.close();
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
+        // 创建文件输入流
+        FileInputStream fileInputStream = new FileInputStream(input);
+        // 创建一个字节数组来存储读取的数据
+        if (!verifyMagicNumber(fileInputStream)) {
+            throw new MyException("Magic number is not correct");
         }
+        // 读取huffman树
+        TreeNode root = delinearization(fileInputStream);
+
+        // 读取文件大小
+        this.fileBitSize = getCompressedFileSize(fileInputStream);
+
+        // 创建文件输出流,在原始目录下创建一个新的文件
+        String outputFileName = input.getName().substring(0, input.getName().length() - 3);
+        FileOutputStream fileOutputStream = new FileOutputStream(input.getParent() + "/" + outputFileName);
+
+        // 读取文件内容并且做映射写入
+        unCompressedFile(fileInputStream, fileOutputStream, root);
+
+        fileOutputStream.close();
+        fileInputStream.close();
 
     }
 
