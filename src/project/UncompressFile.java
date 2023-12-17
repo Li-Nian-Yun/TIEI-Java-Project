@@ -1,7 +1,6 @@
 package project;
 
 import java.io.*;
-import java.nio.Buffer;
 
 import static project.HuffMan.delinearization;
 
@@ -13,6 +12,10 @@ public class UncompressFile {
     private final int READ_BUFFER_SIZE = 1024;
     private final byte[] Buffer = new byte[READ_BUFFER_SIZE];
     private static int MAGIC_NUMBER = 123456789;
+
+    private int currentByte;
+    private int bitsRemaining;
+    private Long fileSize;
 
     public UncompressFile(int magicNumber) {
         MAGIC_NUMBER = magicNumber;
@@ -36,56 +39,96 @@ public class UncompressFile {
         try {
             // 创建文件输入流
             FileInputStream fileInputStream = new FileInputStream(input);
-//            byte[] buffer = new byte[READ_BUFFER_SIZE];
-//            int bytesRead;
-//            // 循环读取文件内容
-//            while ((bytesRead = fileInputStream.read(buffer)) != -1) {
-//                for (byte item : buffer) {
-//                    System.out.println(item);
-//                }
-//            }
             // 创建一个字节数组来存储读取的数据
-            if(!verifyMagicNumber(fileInputStream)) {
+            if (!verifyMagicNumber(fileInputStream)) {
                 System.out.println("Magic number is not correct.");
                 return;
             }
             // 读取huffman树
             TreeNode root = delinearization(fileInputStream);
 
+            // 读取文件大小
+            this.fileSize = getCompressedFileSize(fileInputStream);
+
+            // 创建文件输出流,在原始目录下创建一个新的文件
+            String outputFileName = input.getName().substring(0, input.getName().length() - 3);
+            FileOutputStream fileOutputStream = new FileOutputStream(input.getParent() + "/" + outputFileName);
+
+            // 读取文件内容并且做映射写入
+            unCompressedFile(fileInputStream, fileOutputStream, root);
+
             fileInputStream.close();
         } catch (IOException e) {
-            System.out.println("读取文件发生错误");
+            System.out.println(e.getMessage());
         }
 
     }
 
+    private void unCompressedFile(FileInputStream inputStream, FileOutputStream outputStream, TreeNode root) {
+        try {
+            TreeNode current = root;
+            int nextBit;
+            while ((nextBit = readNextBit(inputStream)) != -1) {
+                // 根据读取的位移动到左或右
+                current = (nextBit == 0) ? current.left : current.right;
+
+                // 如果是叶子节点，则写入数据并重置到根节点
+                if (current.left == null && current.right == null) {
+                    outputStream.write(current.data);
+                    current = root;
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // 从输入流中读取下一个位
+    public int readNextBit(FileInputStream inputStream) throws IOException {
+        if (bitsRemaining == 0) {
+            currentByte = inputStream.read();
+            this.fileSize--;
+            if (currentByte == -1) {
+                return -1; // 文件结束
+            }
+            bitsRemaining = 8;
+        }
+        bitsRemaining--;
+        return (currentByte >> bitsRemaining) & 1;
+    }
+
+    private Long getCompressedFileSize(FileInputStream fileInputStream) throws IOException {
+        return getNumber(fileInputStream);
+    }
+
     private boolean verifyMagicNumber(FileInputStream fileInputStream) throws IOException {
+        // Read the magic number bytes
+        return getNumber(fileInputStream) == MAGIC_NUMBER;
+    }
+
+    private Long getNumber(FileInputStream fileInputStream) throws IOException {
         // Read the first byte to determine the size of the magic number
         int size = fileInputStream.read();
         if (size <= 0) {
             // If the size is not positive, return false
-            return false;
+            throw new IOException("File is corrupted.");
         }
 
-        // Create a byte array to hold the magic number bytes
+        // Create a byte array to hold the number bytes
         byte[] buffer = new byte[size];
 
-        // Read the magic number bytes
+        // Read the number bytes
         int bytesRead = fileInputStream.read(buffer);
         if (bytesRead != size) {
             // If the correct number of bytes were not read, return false
-            return false;
+            throw new IOException("File is corrupted.");
         }
 
         // Convert the bytes to an integer
-        int readMagicNumber = 0;
-        for (int i = 0; i < size; i++) {
-            readMagicNumber = (readMagicNumber << 8) | (buffer[i] & 0xFF);
+        long readNumber = 0;
+        for (int i = size - 1; i >= 0; i--) {
+            readNumber = (readNumber << 8) | (buffer[i] & 0xFF);
         }
-
-        // Compare the read magic number with the MAGIC_NUMBER
-        return readMagicNumber == MAGIC_NUMBER;
+        return readNumber;
     }
-
-
 }

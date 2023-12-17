@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class test {
     public static void main(String[] args) throws FileNotFoundException {
-        File filePath = new File("./files/words.zip.hu");
+        File filePath = new File("./files/words.txt.hu");
         HuffmanModel model = new HuffmanModel();
         model.uncompress(filePath);
     }

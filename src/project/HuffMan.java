@@ -163,23 +163,45 @@ public class HuffMan {
 
     public static TreeNode delinearization(FileInputStream fileInputStream) throws IOException {
         TreeNode root = new TreeNode(null, 0);
-        byte[] buffer = new byte[READ_BUFFER_SIZE];
-        int bytesRead = fileInputStream.read(buffer);
         delinearizationHelper(fileInputStream, root);
         return root;
     }
+
+
+    // 方法，将哈夫曼树转换为映射
+    public static Map<Integer, Byte> huffmanTreeToMap(TreeNode root) {
+        Map<Integer, Byte> huffmanMap = new HashMap<>();
+        traverseTree(root, "", huffmanMap);
+        return huffmanMap;
+    }
+
+    // 辅助递归函数，遍历树并构建映射
+    private static void traverseTree(TreeNode node, String code, Map<Integer, Byte> map) {
+        if (node != null) {
+            if (node.left == null && node.right == null) {
+                // 遇到叶子节点，添加到映射中
+                map.put(Integer.parseInt(code, 2), node.data);
+            } else {
+                // 遍历左子树，编码添加"0"
+                traverseTree(node.left, code + "0", map);
+                // 遍历右子树，编码添加"1"
+                traverseTree(node.right, code + "1", map);
+            }
+        }
+    }
+
 
     private static void delinearizationHelper(FileInputStream fileInputStream, TreeNode node) throws IOException {
         int readByte = fileInputStream.read();
         if (readByte == -1) return;
 
-        if (readByte == 0) {
+        if (readByte == 1) {
             // Internal node
             node.left = new TreeNode(null, 0);
             delinearizationHelper(fileInputStream, node.left);
             node.right = new TreeNode(null, 0);
             delinearizationHelper(fileInputStream, node.right);
-        } else if (readByte == 1) {
+        } else if (readByte == 0) {
             // Leaf node
             node.data = (byte) fileInputStream.read();
         }
