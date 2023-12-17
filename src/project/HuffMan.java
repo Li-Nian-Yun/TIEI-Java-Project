@@ -52,11 +52,11 @@ public class HuffMan {
     public static void linearization(TreeNode node, ArrayList<Byte> linearArray){
         if(node!=null){
             if(node.data==null){
-                linearArray.add((byte) 0);
+                linearArray.add((byte) 1);
                 linearization(node.left,linearArray);
                 linearization(node.right,linearArray);
             }else{
-                linearArray.add((byte) 1);
+                linearArray.add((byte) 0);
                 linearArray.add(node.data);
             }
         }
@@ -67,11 +67,11 @@ public class HuffMan {
         ArrayList<Byte> linearArray = new ArrayList<>();
         if(node!=null){
             if(node.data==null){
-                linearArray.add((byte) 0);
+                linearArray.add((byte) 1);
                 linearization(node.left,linearArray);
                 linearization(node.right,linearArray);
             }else{
-                linearArray.add((byte) 1);
+                linearArray.add((byte) 0);
                 linearArray.add(node.data);
             }
         }
